@@ -17,8 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.example.criminalintent.R
-import com.example.criminalintent.model.Crime
-import java.util.Locale
+import com.example.criminalintent.database.entities.Crime
 
 private const val TAG = "CrimeListFragment"
 
@@ -28,11 +27,6 @@ class CrimeListFragment : Fragment() {
     private lateinit var crimesRecyclerView: RecyclerView
     private var crimeAdapter: CrimeAdapter? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "Crimes count: ${viewModel.crimeList.size}")
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,12 +35,18 @@ class CrimeListFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_crime_list, container, false)
         initViews(view)
 
-        updateUI()
         return view
     }
 
-    private fun updateUI() {
-        crimeAdapter = CrimeAdapter(viewModel.crimeList)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.crimeList.observe(viewLifecycleOwner) {crimeList ->
+            updateUI(crimeList)
+        }
+    }
+
+    private fun updateUI(crimeList: List<Crime>) {
+        crimeAdapter = CrimeAdapter(crimeList)
         crimesRecyclerView.adapter = crimeAdapter
     }
 

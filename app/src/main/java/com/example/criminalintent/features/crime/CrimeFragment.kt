@@ -11,7 +11,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.example.criminalintent.R
-import com.example.criminalintent.model.Crime
+import com.example.criminalintent.database.entities.Crime
 
 class CrimeFragment: Fragment() {
     private lateinit var crime: Crime
