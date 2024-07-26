@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.example.criminalintent.database.CrimeRepository
 import com.example.criminalintent.database.entities.Crime
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 class CrimeDetailsViewModel:ViewModel() {
@@ -18,5 +20,11 @@ class CrimeDetailsViewModel:ViewModel() {
 
     fun loadCrime(crimeId:UUID) {
         crimeIdLiveData.value = crimeId
+    }
+
+    fun updateCrime(crime: Crime) {
+        viewModelScope.launch {
+            crimeRepository.updateCrime(crime)
+        }
     }
 }

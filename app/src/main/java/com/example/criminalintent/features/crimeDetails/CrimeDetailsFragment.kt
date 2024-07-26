@@ -82,6 +82,11 @@ class CrimeDetailsFragment : Fragment() {
         setListenersOnViews()
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModel.updateCrime(crime)
+    }
+
     private fun setListenersOnViews() {
         setEtCrimeTitleListener()
         setCbSolvedListener()
