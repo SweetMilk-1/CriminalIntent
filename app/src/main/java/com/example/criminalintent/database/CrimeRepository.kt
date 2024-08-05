@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import com.example.criminalintent.database.entities.Crime
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.lang.IllegalStateException
 import java.lang.Thread.sleep
@@ -29,6 +30,7 @@ class CrimeRepository private constructor(context: Context) {
     }
 
     suspend fun addCrime(crime: Crime) = withContext(Dispatchers.IO) {
+
         crimeDao.addCrime(crime)
     }
 
