@@ -5,4 +5,7 @@
     <string name="details_label">DETAILS</string>
     <string name="solved_text">Solved</string>
     <string name="contact_the_police_button">Contact the police</string>
+    <string name="new_crime_menu_item">New crime</string>
+    <string name="add_new_crime_button">Add new crime</string>
+    <string name="list_empty_text_view">Crime list is empty</string>
 </resources>

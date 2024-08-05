@@ -3,6 +3,9 @@ package com.example.criminalintent.features.crimeList
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
@@ -23,6 +26,11 @@ class CrimeListFragment : Fragment() {
     private lateinit var crimesRecyclerView: RecyclerView
     private var callbacks: Callbacks? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,6 +42,27 @@ class CrimeListFragment : Fragment() {
         customizeCrimesRecyclerView()
 
         return view
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.fragment_crime_list, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId) {
+            R.id.new_crime -> {
+                createNewCrime()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun createNewCrime() {
+        val crime = Crime()
+        viewModel.addCrime(crime)
+        callbacks?.onCrimeSelected(crime.id)
     }
 
     private fun customizeCrimesRecyclerView() {
