@@ -23,11 +23,8 @@ private const val ARG_CRIME_ID = "ARG_CRIME_ID"
 
 private const val DIALOG_DATE_PICKER = "DIALOG_DATE_PICKER"
 private const val DIALOG_TIME_PICKER = "DIALOG_TIME_PICKER"
-private const val REQUEST_DATE = 0
-private const val REQUEST_TIME = 1
 
-class CrimeDetailsFragment : Fragment(),
-    DatePickerFragment.Callbacks, TimePickerFragment.Callbacks {
+class CrimeDetailsFragment : Fragment() {
     private val viewModel: CrimeDetailsViewModel by viewModels()
 
     private lateinit var crime: Crime
@@ -44,6 +41,7 @@ class CrimeDetailsFragment : Fragment(),
 
         viewModel.loadCrime(crimeId)
         crime = Crime()
+
     }
 
     override fun onCreateView(
@@ -116,12 +114,19 @@ class CrimeDetailsFragment : Fragment(),
         btnCrimeDate.apply {
             setOnClickListener {
                 DatePickerFragment.newInstance(crime.date).apply {
-                    setTargetFragment(this@CrimeDetailsFragment, REQUEST_DATE)
                     show(
                         this@CrimeDetailsFragment.getParentFragmentManager(), DIALOG_DATE_PICKER
                     )
                 }
             }
+        }
+        parentFragmentManager.setFragmentResultListener(
+            DatePickerFragment.REQUEST_DATE,
+            viewLifecycleOwner
+        ) { key, bundle ->
+            val date = bundle.getSerializable(DatePickerFragment.EXTRA_REQUEST_DATE) as Date
+            crime.date.date = date.date
+            updateUI()
         }
     }
 
@@ -129,12 +134,20 @@ class CrimeDetailsFragment : Fragment(),
         btnCrimeTime.apply {
             setOnClickListener {
                 TimePickerFragment.newInstance(crime.date).apply {
-                    setTargetFragment(this@CrimeDetailsFragment, REQUEST_TIME)
                     show(
                         this@CrimeDetailsFragment.getParentFragmentManager(), DIALOG_TIME_PICKER
                     )
                 }
             }
+        }
+        parentFragmentManager.setFragmentResultListener(
+            TimePickerFragment.REQUEST_TIME,
+            viewLifecycleOwner
+        ) { key, bundle ->
+            val time = bundle.getSerializable(TimePickerFragment.EXTRA_REQUEST_TIME) as Date
+            crime.date.hours = time.hours
+            crime.date.minutes = time.minutes
+            updateUI()
         }
     }
 
@@ -169,16 +182,5 @@ class CrimeDetailsFragment : Fragment(),
             fragment.arguments = args
             return fragment
         }
-    }
-
-    override fun onDateSelected(date: Date) {
-        crime.date.date = date.date
-        updateUI()
-    }
-
-    override fun onTimeSelected(time: Date) {
-        crime.date.hours = time.hours
-        crime.date.minutes = time.minutes
-        updateUI()
     }
 }

@@ -7,7 +7,6 @@ import kotlinx.coroutines.Dispatchers
 
 class CriminalIntentApplication: Application() {
 
-    private val dataBaseScope = CoroutineScope(Dispatchers.IO)
     override fun onCreate() {
         super.onCreate()
         CrimeRepository.initialize(this, )

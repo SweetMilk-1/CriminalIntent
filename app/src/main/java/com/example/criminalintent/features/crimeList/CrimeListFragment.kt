@@ -10,12 +10,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.example.criminalintent.R
 import com.example.criminalintent.database.entities.Crime
@@ -32,10 +32,6 @@ class CrimeListFragment : Fragment() {
 
     private var callbacks: Callbacks? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,19 +46,25 @@ class CrimeListFragment : Fragment() {
         return view
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.fragment_crime_list, menu)
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.new_crime -> {
-                createNewCrime()
-                true
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.fragment_crime_list, menu)
             }
-            else -> super.onOptionsItemSelected(item)
-        }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.new_crime -> {
+                        createNewCrime()
+                        true
+                    }
+                    else -> true
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun createNewCrime() {
@@ -77,8 +79,7 @@ class CrimeListFragment : Fragment() {
         viewModel.crimeList.observe(viewLifecycleOwner) { crimeList ->
             if (crimeList.isEmpty()) {
                 showEmptyListPanel(true)
-            }
-            else {
+            } else {
                 showEmptyListPanel(false)
                 crimeAdapter.submitList(crimeList)
             }
@@ -92,7 +93,7 @@ class CrimeListFragment : Fragment() {
     }
 
     private fun setListeners() {
-        btnAddNewCrime.setOnClickListener{
+        btnAddNewCrime.setOnClickListener {
             createNewCrime()
         }
     }
