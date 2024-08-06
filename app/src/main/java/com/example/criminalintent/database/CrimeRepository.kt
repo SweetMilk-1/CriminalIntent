@@ -18,7 +18,9 @@ class CrimeRepository private constructor(context: Context) {
         context,
         CrimeDatabase::class.java,
         DATABASE_NAME
-    ).build()
+    )
+        .addMigrations(migration_1_2)
+        .build()
 
     private val crimeDao = crimeDatabase.crimeDao()
 
@@ -30,7 +32,6 @@ class CrimeRepository private constructor(context: Context) {
     }
 
     suspend fun addCrime(crime: Crime) = withContext(Dispatchers.IO) {
-
         crimeDao.addCrime(crime)
     }
 

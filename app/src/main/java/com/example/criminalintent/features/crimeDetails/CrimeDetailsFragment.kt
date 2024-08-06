@@ -1,7 +1,11 @@
 package com.example.criminalintent.features.crimeDetails
 
+import android.app.Activity
+import android.content.Intent
 import android.icu.text.DateFormat
+import android.net.Uri
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -10,12 +14,14 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.criminalintent.R
 import com.example.criminalintent.common.datepicker.DatePickerFragment
 import com.example.criminalintent.common.timepicker.TimePickerFragment
 import com.example.criminalintent.database.entities.Crime
+import java.security.InvalidParameterException
 import java.util.Date
 import java.util.UUID
 
@@ -26,6 +32,32 @@ private const val DIALOG_TIME_PICKER = "DIALOG_TIME_PICKER"
 
 class CrimeDetailsFragment : Fragment() {
     private val viewModel: CrimeDetailsViewModel by viewModels()
+    private val suspectActivityLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode != Activity.RESULT_OK) {
+                return@registerForActivityResult
+            }
+            val contactUri: Uri =
+                result.data?.data ?: throw InvalidParameterException("Uri can not be null")
+            val queryFields = arrayOf(ContactsContract.Contacts.DISPLAY_NAME)
+            val cursor = requireActivity().contentResolver
+                .query(
+                    contactUri,
+                    queryFields,
+                    null,
+                    null,
+                    null
+                )
+            cursor?.use {
+                if (it.count == 0)
+                    return@registerForActivityResult
+                it.moveToFirst()
+                val suspect = it.getString(0)
+                crime.suspect = suspect
+                viewModel.updateCrime(crime)
+                btnSuspect.text = suspect
+            }
+        }
 
     private lateinit var crime: Crime
 
@@ -33,6 +65,8 @@ class CrimeDetailsFragment : Fragment() {
     private lateinit var btnCrimeDate: Button
     private lateinit var btnCrimeTime: Button
     private lateinit var cbSolved: CheckBox
+    private lateinit var btnSendReport: Button
+    private lateinit var btnSuspect: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +93,8 @@ class CrimeDetailsFragment : Fragment() {
         btnCrimeDate = view.findViewById(R.id.btn_crime_date)
         btnCrimeTime = view.findViewById(R.id.btn_crime_time)
         cbSolved = view.findViewById(R.id.cb_solved)
+        btnSendReport = view.findViewById(R.id.btn_send_report)
+        btnSuspect = view.findViewById(R.id.btn_suspect)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -108,6 +144,8 @@ class CrimeDetailsFragment : Fragment() {
         setCbSolvedListener()
         setBtnCrimeDateListener()
         setBtnCrimeTimeListener()
+        setBtnSendReportListener()
+        setBtnSuspectListener()
     }
 
     private fun setBtnCrimeDateListener() {
@@ -169,6 +207,50 @@ class CrimeDetailsFragment : Fragment() {
         }
 
         etCrimeTitle.addTextChangedListener(textWatcher)
+    }
+
+    private fun setBtnSendReportListener() {
+        btnSendReport.setOnClickListener {
+            val report = getCrimeReport()
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, report)
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.crime_report_subject))
+            }
+            val chooserIntent = Intent.createChooser(
+                intent,
+                getString(R.string.crime_report)
+            )
+            startActivity(chooserIntent)
+        }
+    }
+
+    private fun setBtnSuspectListener() {
+        btnSuspect.setOnClickListener{
+            val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
+            suspectActivityLauncher.launch(intent)
+        }
+    }
+
+    private fun getCrimeReport(): String {
+        val solvedString = if (crime.isSolved)
+            getString(R.string.crime_report_solved)
+        else
+            getString(R.string.crime_report_not_solved)
+
+        val dateString = DateFormat
+            .getPatternInstance(DateFormat.YEAR_MONTH_DAY)
+            .format(crime.date)
+
+        val suspectString = if (crime.suspect.isBlank())
+            getString(R.string.crime_report_no_suspect)
+        else
+            getString(R.string.crime_report_suspect, crime.suspect)
+
+        return getString(
+            R.string.crime_report,
+            crime.title, dateString, solvedString, suspectString
+        )
     }
 
     companion object {
