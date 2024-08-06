@@ -2,6 +2,8 @@ package com.example.criminalintent.features.crimeDetails
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ResolveInfo
 import android.icu.text.DateFormat
 import android.net.Uri
 import android.os.Bundle
@@ -75,7 +77,6 @@ class CrimeDetailsFragment : Fragment() {
 
         viewModel.loadCrime(crimeId)
         crime = Crime()
-
     }
 
     override fun onCreateView(
@@ -126,6 +127,10 @@ class CrimeDetailsFragment : Fragment() {
         cbSolved.apply {
             isChecked = crime.isSolved
             jumpDrawablesToCurrentState()
+        }
+
+        if (crime.suspect.isNotBlank()) {
+            btnSuspect.text = crime.suspect
         }
     }
 
@@ -226,9 +231,18 @@ class CrimeDetailsFragment : Fragment() {
     }
 
     private fun setBtnSuspectListener() {
-        btnSuspect.setOnClickListener{
+        btnSuspect.apply {
             val intent = Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
-            suspectActivityLauncher.launch(intent)
+            setOnClickListener {
+                suspectActivityLauncher.launch(intent)
+            }
+            val packageManager = requireActivity().packageManager
+            val resolvedActivity = packageManager.resolveActivity(
+                intent,
+                PackageManager.MATCH_DEFAULT_ONLY
+            )
+            if (resolvedActivity == null)
+                isEnabled = false
         }
     }
 
