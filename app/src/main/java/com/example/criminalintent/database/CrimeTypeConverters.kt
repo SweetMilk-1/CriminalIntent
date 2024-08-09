@@ -4,6 +4,8 @@ import androidx.room.TypeConverter
 import java.util.Date
 import java.util.UUID
 
+//Класс для конвертации типов данных БД в тип данных Kotlin
+//В данном случае конвертируются Data и UUID
 class CrimeTypeConverters {
     @TypeConverter
     fun fromDate(date: Date?): Long? = date?.time

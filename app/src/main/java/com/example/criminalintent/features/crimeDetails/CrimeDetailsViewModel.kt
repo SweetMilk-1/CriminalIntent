@@ -10,6 +10,11 @@ import com.example.criminalintent.database.entities.Crime
 import kotlinx.coroutines.launch
 import java.util.UUID
 
+/*
+* ViewModel для CrimeDetails. Преимучество ViewMode - он не удаляется
+* при удалении родительского компонента.
+* Здесь можно легковесную хранить логику по работе с моделью приложения
+* */
 class CrimeDetailsViewModel:ViewModel() {
     private val crimeRepository = CrimeRepository.get()
 

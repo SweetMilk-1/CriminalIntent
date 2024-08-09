@@ -8,6 +8,7 @@ import androidx.room.Update
 import com.example.criminalintent.database.entities.Crime
 import java.util.UUID
 
+//Объект для доступа к данным из БД
 @Dao
 abstract class CrimeDao {
     @Query("select * from crime")

@@ -13,6 +13,12 @@ import androidx.room.Room as Room1
 
 private const val DATABASE_NAME = "crime-database"
 
+/*
+* Класс для реализации патерна Репозиторий.
+* Является уровнем абтракции между базой данных и Activity. Также это
+* синглтон объект, который имеет только один инстанс для безопасного доступа
+* объект БД
+* */
 class CrimeRepository private constructor(context: Context) {
     private val crimeDatabase: CrimeDatabase = Room1.databaseBuilder(
         context,
@@ -20,6 +26,7 @@ class CrimeRepository private constructor(context: Context) {
         DATABASE_NAME
     )
         .addMigrations(migration_1_2)
+        .addMigrations(migration_2_3)
         .build()
 
     private val crimeDao = crimeDatabase.crimeDao()

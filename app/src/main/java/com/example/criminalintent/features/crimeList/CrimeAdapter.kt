@@ -8,6 +8,11 @@ import androidx.recyclerview.widget.ListAdapter
 import com.example.criminalintent.R
 import com.example.criminalintent.database.entities.Crime
 
+/*
+* Адаптер для листа преступлений. Отвечает за создание ViewHolder
+* и привязки к нему данных. В себя он принимает масив элементов и оптимальным
+* образом создает или переиспользует ViewHoleder
+* */
 class CrimeAdapter(
     context: Context,
     private val callbacks: CrimeViewHolder.Callbacks?
@@ -23,6 +28,11 @@ class CrimeAdapter(
     }
 }
 
+/*
+* Это коллбэк для определения разницы между исходным и новыми элементами массива
+* Благодаря ему нет необходимости пересоздавать на каждое изменение массива новый
+* адаптер, а также благодаря нему можно получить бесплатную анимацию)
+* */
 class CrimeDiffUtilItemCallbacks : DiffUtil.ItemCallback<Crime>() {
     override fun areItemsTheSame(oldItem: Crime, newItem: Crime): Boolean {
         return oldItem.id == newItem.id

@@ -49,6 +49,11 @@ class CrimeListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        /*
+        * В этом месте настраивается AppBar в приложении. Создается хост,
+        * к которому привязывается xml файл меню и навешиваются обработчики события
+        * на каждый элемент
+        * */
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -73,6 +78,11 @@ class CrimeListFragment : Fragment() {
         callbacks?.onCrimeSelected(crime.id)
     }
 
+    /*
+    * Функция занимается настройкой RecyclerView: создает адаптер и навешивает
+    * колбэк на LiveData из ViewModel, который при изменении данных
+    * отправит новый список с новыми данными в адаптер и поменяет данные на экране
+    * */
     private fun customizeCrimesRecyclerView() {
         crimeAdapter = CrimeAdapter(requireContext(), callbacks)
         crimesRecyclerView.adapter = crimeAdapter

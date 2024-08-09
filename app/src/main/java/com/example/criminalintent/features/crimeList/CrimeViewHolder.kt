@@ -9,6 +9,11 @@ import com.example.criminalintent.R
 import com.example.criminalintent.database.entities.Crime
 import java.util.UUID
 
+/*
+* Тот самый ViewHolder. Этот класс связывает View в списке RecuclerView
+* и объект класса листа. Внутри себя обновляет данные виджетов при
+* привязки нового элемента
+* */
 class CrimeViewHolder(
     view: View,
     private val crimeListFragmentCallbacks: Callbacks?
